@@ -51,9 +51,11 @@
     <Compile Include="Formatting\AdvancingStrategy.cs" />
     <Compile Include="CharacterClass.cs" />
     <Compile Include="Formatting\FormatObjects.cs" />
+    <Compile Include="Formatting\InlineLayoutEngine.cs" />
     <Compile Include="Formatting\JustifiedLine.cs" />
     <Compile Include="Formatting\ParagraphBuilder.cs" />
     <Compile Include="Formatting\ParagraphModel.cs" />
+    <Compile Include="Formatting\UnjustifiedLine.cs" />
     <Compile Include="Formatting\UnjustifiedLineBuilder.cs" />
     <Compile Include="GlyphMetric.cs" />
     <Compile Include="ILatinWordMetric.cs" />

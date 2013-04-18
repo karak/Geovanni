@@ -97,10 +97,10 @@ namespace TextComposing.Formatting
             }
         }
 
-        LineBreaking.IUnjustifiedLine<Printing.IPrintableLine> LineBreaking.IParagraphModel<Printing.IPrintableLine, InlineStyle>.CreateLine(LineBreaking.IBreakPoint from, LineBreaking.IBreakPoint to, InlineStyle style, out InlineStyle newStyle)
+        LineBreaking.IUnjustifiedLine<Printing.IPrintableLine> LineBreaking.IParagraphModel<Printing.IPrintableLine, InlineStyle>.CreateLine(LineBreaking.ILineConstraint constraint, LineBreaking.IBreakPoint from, LineBreaking.IBreakPoint to, InlineStyle style, out InlineStyle newStyle)
         {
-            var factory = new LineFactory(_objectList);
-            return factory.CreateLine(style, from, to, out newStyle);
+            var factory = new UnjustifiedLineBuilder(_objectList);
+            return factory.CreateLine(constraint, style, from, to, out newStyle);
         }
     }
 }

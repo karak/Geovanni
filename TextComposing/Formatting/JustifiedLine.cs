@@ -32,13 +32,25 @@ namespace TextComposing.Formatting
         }
     }
 
-    internal abstract class InlineElement
+    internal abstract class InlineElement : Printing.IPrintable
     {
         public abstract void PrintBy(Printing.IPrinter printer);
     }
 
+    internal sealed class EmptyInlineElement : InlineElement
+    {
+        public override void PrintBy(Printing.IPrinter printer)
+        {
+        }
+
+        public override string ToString()
+        {
+            return String.Empty;
+        }
+    }
+
     /// <summary>
-    /// 一行内の文章
+    /// 一行内の文字列一般
     /// </summary>
     internal abstract class InlineText : InlineElement
     {
@@ -50,8 +62,17 @@ namespace TextComposing.Formatting
         {
             return new InlineLetterJpWithEmphasysDots(this);
         }
+
+        public override string ToString()
+        {
+            var offset = this.Offset;
+            return String.Format("{0}[{1}{2}]", this.Text, offset > 0? offset + "+" : "", Length - offset);
+        }
     }
 
+    /// <summary>
+    /// 一行内の和文一文字
+    /// </summary>
     internal class InlineLetterJp : InlineText
     {
         internal InlineLetterJp(float length, float offset, UChar letter)
@@ -93,13 +114,11 @@ namespace TextComposing.Formatting
 
             printer.PrintJapaneseLetter(_letter, amount);
         }
-
-        public override string ToString()
-        {
-            return _letter.ToString();
-        }
     }
 
+    /// <summary>
+    /// 一行内の和文一文字、圏点付き。
+    /// </summary>
     internal class InlineLetterJpWithEmphasysDots : InlineText
     {
         private InlineText _decoratee;
@@ -160,6 +179,9 @@ namespace TextComposing.Formatting
         }
     }
 
+    /// <summary>
+    /// 一行内の欧文部分単語（ハイフネーション含む）
+    /// </summary>
     internal class InlineWordPartLatin : InlineText
     {
         internal InlineWordPartLatin(float length, float offset, UString text)
@@ -204,6 +226,9 @@ namespace TextComposing.Formatting
         }
     }
 
+    /// <summary>
+    /// 一行内のルビ付き文字列
+    /// </summary>
     internal class InlineTextWithRuby : InlineElement
     {
         private float _appendingLength;
@@ -245,7 +270,7 @@ namespace TextComposing.Formatting
 
         public override string ToString()
         {
-            return String.Format("{0}（{1}）", String.Join("", (Object[])_baseText), String.Join("", (Object[])_rubyText));
+            return String.Format("{0}（[RUBY]{1}）[/RUBY]", String.Join("", (Object[])_baseText), String.Join("", (Object[])_rubyText));
         }
     }
 }

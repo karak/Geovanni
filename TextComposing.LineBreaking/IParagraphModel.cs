@@ -28,11 +28,15 @@ namespace TextComposing.LineBreaking
         /// <summary>
         /// 指定範囲を含んだ行（字間調整前）を作成する。
         /// </summary>
+        /// <param name="constraint">行の制約</param>
         /// <param name="from">行直前の分割点</param>
         /// <param name="to">行直後の分割点</param>
         /// <param name="currentState">現在の計算状態</param>
         /// <param name="newState">処理後の計算状態</param>
-        IUnjustifiedLine<TLine> CreateLine(IBreakPoint from, IBreakPoint to, TState currentState, out TState newState);
+        /// <remarks>
+        /// <paramref name="constraint"/>はオリジナルのKnuth-Plassにはないが、行内の最適配置の算出に必要（ルビなど）
+        /// </remarks>
+        IUnjustifiedLine<TLine> CreateLine(ILineConstraint constraint, IBreakPoint from, IBreakPoint to, TState currentState, out TState newState);
     }
 
     /// <summary>

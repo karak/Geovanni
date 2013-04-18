@@ -28,6 +28,16 @@ namespace TextComposing.LineBreaking
         float LengthOf(int lineNumber);
     }
 
+    public interface ILineConstraint
+    {
+        float SuitableLength { get; }
+    }
+
+    internal class LineConstraint : ILineConstraint
+    {
+        public float SuitableLength { get; set; }
+    }
+
     /// <summary>
     /// Knuth-Plassアルゴリズムによるソルバ。
     /// </summary>
@@ -53,7 +63,7 @@ namespace TextComposing.LineBreaking
             var track = ComputeBreakPoints(paragraph, frame);
             if (track.Count == 0)
             {
-                return ForceLayoutInOneLine(paragraph);
+                return new TLine[] { ForceLayoutInOneLine(paragraph, frame).Justify(1) };
             }
             else
             {
@@ -61,12 +71,14 @@ namespace TextComposing.LineBreaking
             }
         }
 
-        private static TLine[] ForceLayoutInOneLine(IParagraphModel<TLine, TState> paragraph)
+        private static IUnjustifiedLine<TLine> ForceLayoutInOneLine(IParagraphModel<TLine, TState> paragraph, IFrameModel frame)
         {
+            var length = frame.LengthOf(1);
+            var constraint = new LineConstraint { SuitableLength = length };
             var style = new TState();
             var ignore = new TState();
-            var unjustifiedLine = paragraph.CreateLine(paragraph.StartPoint, paragraph.EndPoint, style, out ignore);
-            return new TLine[] { unjustifiedLine.Justify(1.0) };
+            var unjustifiedLine = paragraph.CreateLine(constraint, paragraph.StartPoint, paragraph.EndPoint, style, out ignore);
+            return unjustifiedLine;
         }
 
         private List<ActiveNode> ComputeBreakPoints(IParagraphModel<TLine, TState> paragraph, IFrameModel frame)
@@ -85,12 +97,29 @@ namespace TextComposing.LineBreaking
                     ActiveNode nextNode = TryBreakHere(paragraph, frame, breakPoint, activeNode, out doDeactivate);
                     if (nextNode != null)
                     {
-                        AddBetterActiveNode(breakPointNodes, nextNode);
+                        bool betterThanTheOthers = AddBetterActiveNode(breakPointNodes, nextNode);
+#if TRACE_TRY_BREAK
+                        Console.WriteLine("#ACTIVATE    | {0}", nextNode);
+                        if (betterThanTheOthers)
+                        {
+                            Console.WriteLine("#...BETTER   |");
+                        }
+#endif
                     }
                     var next = activeNodeNode.Next;
                     if (doDeactivate)
                     {
                         storedActiveNodeList.Remove(activeNodeNode);
+#if TRACE_TRY_BREAK
+                        if (nextNode != null)
+                        {
+                            Console.WriteLine("#ACCEPT  From| {0:12} | To:{1:12}", activeNode, nextNode);
+                        }
+                        else
+                        {
+                            Console.WriteLine("#DECLINE From| {0:12}", activeNode);
+                        }
+#endif
                     }
                     activeNodeNode = next;
                 }
@@ -107,9 +136,7 @@ namespace TextComposing.LineBreaking
             else
             {
                 //失敗した場合は一行におさめる
-                var initialStyle = new TState();
-                var ignore = new TState();
-                var line = paragraph.CreateLine(paragraph.StartPoint, paragraph.EndPoint, initialStyle, out ignore);
+                var line = ForceLayoutInOneLine(paragraph, frame);
                 return new List<ActiveNode>
                 {
                     ActiveNode.CreateBreakNode(paragraph.EndPoint, line, FitnessClass.Tight/*dummy*/, null, 0.0, 0.0, startNode)
@@ -134,10 +161,11 @@ namespace TextComposing.LineBreaking
             out bool doDeactivate)
         {
             var nextLineNumber = prevNode.LineNumber + 1;
-            var requiredLength = frame.LengthOf(nextLineNumber);
+            var suitableLength = frame.LengthOf(nextLineNumber);
+            var constraint = new LineConstraint { SuitableLength = suitableLength };
             var newStyle = new TState();
-            var line = paragraph.CreateLine(prevNode.Point, breakPoint, prevNode.Style, out newStyle);
-            double ratio = _evaluator.ComputeAdjustmentRatio(line, requiredLength);
+            var line = paragraph.CreateLine(constraint, prevNode.Point, breakPoint, prevNode.Style, out newStyle);
+            double ratio = _evaluator.ComputeAdjustmentRatio(line, suitableLength);
 
             doDeactivate = (ratio < -1 || _evaluator.IsForcedBreakPoint(breakPoint));
 
@@ -155,17 +183,23 @@ namespace TextComposing.LineBreaking
             }
         }
 
-        private static void AddBetterActiveNode(HashSet<ActiveNode> breakPointNodes, ActiveNode newNode)
+        private static bool AddBetterActiveNode(HashSet<ActiveNode> breakPointNodes, ActiveNode newNode)
         {
             var competitor = breakPointNodes.FirstOrDefault(x => x.FitnessClass == newNode.FitnessClass);
             if (competitor == null)
             {
                 breakPointNodes.Add(newNode);
+                return true;
             }
             else if (newNode.IsBetterThan(competitor))
             {
                 breakPointNodes.Remove(competitor);
                 breakPointNodes.Add(newNode);
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
         
@@ -286,10 +320,15 @@ namespace TextComposing.LineBreaking
 
             public override string ToString()
             {
-                return String.Format("{0:D3}: {1:F3}; {2})",
+                var text = (LineBeforeHere != null ? LineBeforeHere.ToString() : "");
+                if (text.Length > 10)
+                {
+                    text = (text.Substring(0, 3) + "..." + text.Substring(text.Length - 6));
+                }
+                return String.Format("{0:D3}: {1:F3}; {2}",
                     LineNumber,
                     TotalDemerits,
-                    (LineBeforeHere != null? LineBeforeHere.ToString() : ""));
+                    text);
             }
         }
         #endregion

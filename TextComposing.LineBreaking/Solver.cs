@@ -147,7 +147,7 @@ namespace TextComposing.LineBreaking
         private static bool IsNotEmpty(IEnumerable<ActiveNode> endedNodes)
         {
             var e = endedNodes.GetEnumerator();
-            return !e.MoveNext();
+            return e.MoveNext();
         }
 
         private static ActiveNode FindTheWorstDemerits(IEnumerable<ActiveNode> nodes)

@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{83713885-DEB6-4702-BA1F-9396950D0F00}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>TextComposing</RootNamespace>
+    <AssemblyName>TextComposing</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="iTextAsian, Version=1.0.0.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\iTextSharp-5.3.2\iTextAsian.dll</HintPath>
+    </Reference>
+    <Reference Include="itextsharp, Version=4.1.6.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\iTextSharp-5.3.2\itextsharp.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Formatting\AdvancingStrategy.cs" />
+    <Compile Include="CharacterClass.cs" />
+    <Compile Include="Formatting\FormatObjects.cs" />
+    <Compile Include="Formatting\JustifiedLine.cs" />
+    <Compile Include="Formatting\ParagraphBuilder.cs" />
+    <Compile Include="Formatting\ParagraphModel.cs" />
+    <Compile Include="Formatting\UnjustifiedLineBuilder.cs" />
+    <Compile Include="GlyphMetric.cs" />
+    <Compile Include="ILatinWordMetric.cs" />
+    <Compile Include="IO\AozoraBunkoTextImporter.cs" />
+    <Compile Include="IO\AozoraBunko\Lexers\AccentNotationParser.cs" />
+    <Compile Include="IO\AozoraBunko\Lexers\EmDashReplacer.cs" />
+    <Compile Include="IO\AozoraBunko\Lexers\ExternalCharacterDetector.cs" />
+    <Compile Include="IO\AozoraBunko\Lexers\ExternalCharacterDetector_JisX203.cs" />
+    <Compile Include="IO\AozoraBunko\Lexers\ExternalCharacterParser.cs" />
+    <Compile Include="IO\AozoraBunko\Lexers\InterletterSpaceRemover.cs" />
+    <Compile Include="IO\AozoraBunko\Lexers\KanaRepeatingMarkParser.cs" />
+    <Compile Include="IO\AozoraBunko\Parsers\AnnotationParser.cs" />
+    <Compile Include="IO\AozoraBunko\Parsers\EmphasysDotsParser.cs" />
+    <Compile Include="IO\AozoraBunko\Parsers\HeadingParser.cs" />
+    <Compile Include="IO\AozoraBunko\Parsers\IndentParser.cs" />
+    <Compile Include="IO\AozoraBunko\Parsers\PagingParser.cs" />
+    <Compile Include="IO\AozoraBunko\Parsers\RubyParser.cs" />
+    <Compile Include="IO\AozoraBunko\SpecialCharacters.cs" />
+    <Compile Include="IO\ExchangableTextImporter.cs" />
+    <Compile Include="IO\Exchange\FormattedTextBuffer.cs" />
+    <Compile Include="IO\Exchange\IExchangableText.cs" />
+    <Compile Include="IO\Pdf\PdfPrinter.cs" />
+    <Compile Include="IO\Pdf\PdfFonts.cs" />
+    <Compile Include="IO\Pdf\PdfLatinWordMetric.cs" />
+    <Compile Include="IO\Pdf\ResourceLoader.cs" />
+    <Compile Include="Layout.cs" />
+    <Compile Include="Printing\IPrintable.cs" />
+    <Compile Include="LatinMode.cs" />
+    <Compile Include="Printing\IPrinter.cs" />
+    <Compile Include="LayoutedDocument.cs" />
+    <Compile Include="Utility\LazyList.cs" />
+    <Compile Include="ParagraphStyle.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RunDirection.cs" />
+    <Compile Include="Formatting\SpaceType.cs" />
+    <Compile Include="LayoutEngine.cs" />
+    <Compile Include="InlineStyle.cs" />
+    <Compile Include="Utility\UString.cs" />
+    <Compile Include="WordWrapStrategy.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TextComposing.LineBreaking\TextComposing.LineBreaking.csproj">
+      <Project>{1C09A459-409A-4F9F-8184-B6BCE100BB56}</Project>
+      <Name>TextComposing.LineBreaking</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

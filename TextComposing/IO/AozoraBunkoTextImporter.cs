@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using TextComposing.IO.AozoraBunko.Parsers;
 using TextComposing.IO.AozoraBunko.Lexers;
 using TextComposing.IO.Exchange;
@@ -12,7 +13,17 @@ namespace TextComposing.IO
         public IExchangableText Convert(UString line)
         {
             var buffer = new FormattedTextBuffer();
+            var visitor = CreateTokenVisitor(buffer);
 
+            foreach (var token in RubyParser.Parse(ApplyLexers(line)))
+            {
+                token.Accept(visitor);
+            }
+            return buffer;
+        }
+
+        private static RubyParser.TokenVisitor CreateTokenVisitor(FormattedTextBuffer buffer)
+        {
             var visitor = new RubyParser.TokenVisitor
             {
                 OnNormal = text =>
@@ -53,12 +64,7 @@ namespace TextComposing.IO
                     buffer.Ruby(buffer.Length - baseText.Length, buffer.Length, rubyText);
                 }
             };
-
-            foreach (var token in RubyParser.Parse(ApplyLexers(line)))
-            {
-                token.Accept(visitor);
-            }
-            return buffer;
+            return visitor;
         }
 
         private static IEnumerable<UChar> ApplyLexers(UString line)
@@ -121,8 +127,15 @@ namespace TextComposing.IO
             _isFrozen = true;
             try
             {
+                int startIndex;
+                string title;
+                string[] authors;
+                if (ParseHeaderPart(lines, out startIndex, out title, out authors))
+                {
+                    ;
+                }
                 var indentParser = new IndentParser();
-                foreach (string line in indentParser.ReadLines(lines))
+                foreach (string line in indentParser.ReadLines(lines.Skip(startIndex)))
                 {
                     var isSetIndent = indentParser.IsSetIndent;
                     var textIndent = indentParser.CurrentTextIndent;
@@ -135,6 +148,50 @@ namespace TextComposing.IO
             {
                 _isFrozen = false;
             }
+        }
+
+        private const string ruler = "-------------------------------------------------------";
+
+        private static bool ParseHeaderPart(IEnumerable<string> lines, out int startIndex, out string title, out string[] authors)
+        {
+            string titleBuffer = "";
+            List<string> authorsBuffer = new List<string>(4);
+            int foundCount = 0;
+            int lineIndex = 0;
+            foreach (var line in lines)
+            {
+                if (line == ruler)
+                {
+                    ++foundCount;
+                }
+                else if (foundCount == 0)
+                {
+                    if (lineIndex == 0)
+                    {
+                        titleBuffer = line.TrimStart('　'); ;
+                    }
+                    else if (line.Length > 0)
+                    {
+                        authorsBuffer.Add(line.TrimStart('　'));
+                    }
+                }
+
+                if (foundCount == 2) {
+                    startIndex = lineIndex + 1;
+                    title = titleBuffer;
+                    authors = authorsBuffer.ToArray();
+                    return true;
+                }
+                else if (lineIndex >= 40)
+                {
+                    break;
+                }
+                ++lineIndex;
+            }
+            startIndex = 0;
+            title = null;
+            authors = null;
+            return false;
         }
 
         private Formatting.ParagraphModel BuildParagraph(UString line, bool isSetIndent, int textIndent, int paragraphIndent)

@@ -37,9 +37,31 @@ namespace TextComposing
         float ParagraphIndent { get; }
     }
 
-    internal class AutoParagraphIndentStyle : IParagraphIndentStyle
+    internal class ManualParagraphIndentStyle : IParagraphIndentStyle
     {
+        private readonly float _textIndent;
+        private readonly float _paragraphIndent;
+
+        public ManualParagraphIndentStyle(float textIndent, float paragraphIndent)
+        {
+            _textIndent = textIndent;
+            _paragraphIndent = paragraphIndent;
+        }
+
         float IParagraphIndentStyle.TextIndent(UChar firstLetter)
+        {
+            return _textIndent + IndentOnSpaceType(firstLetter);
+        }
+
+        float IParagraphIndentStyle.ParagraphIndent
+        {
+            get
+            {
+                return this._paragraphIndent;
+            }
+        }
+
+        private static float IndentOnSpaceType(UChar firstLetter)
         {
             switch (Formatting.SpaceTypeExtension.GetSpaceType(firstLetter))
             {
@@ -51,33 +73,8 @@ namespace TextComposing
                 case Formatting.SpaceType.DividingPunctuation:
                 case Formatting.SpaceType.Normal:
                 default:
-                    if (CC.IsCJKIdeograph(firstLetter) || (CC.IsHiragana(firstLetter) || CC.IsKatakana(firstLetter)))
-                        return 1F;
-                    else
-                        return 0F;
+                    return 0F;
             }
-        }
-
-        float IParagraphIndentStyle.ParagraphIndent
-        {
-            get { return 0F; }
-        }
-    }
-
-    internal class ManualParagraphIndentStyle : IParagraphIndentStyle
-    {
-        public ManualParagraphIndentStyle(float textIndent, float paragraphIndent)
-        {
-            TextIndent = textIndent;
-            ParagraphIndent = paragraphIndent;
-        }
-
-        public float TextIndent { get; private set; }
-        public float ParagraphIndent { get; private set; }
-
-        float IParagraphIndentStyle.TextIndent(UChar firstLetter)
-        {
-            return TextIndent;
         }
     }
 }

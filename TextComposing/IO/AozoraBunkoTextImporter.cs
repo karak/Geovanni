@@ -137,10 +137,9 @@ namespace TextComposing.IO
                 var indentParser = new IndentParser();
                 foreach (string line in indentParser.ReadLines(lines.Skip(startIndex)))
                 {
-                    var isSetIndent = indentParser.IsSetIndent;
                     var textIndent = indentParser.CurrentTextIndent;
                     var paragraphIndent = indentParser.CurrentParagraphIndent;
-                    var paragraph = BuildParagraph(new UString(line), isSetIndent, textIndent, paragraphIndent);
+                    var paragraph = BuildParagraph(new UString(line), textIndent, paragraphIndent);
                     yield return paragraph;
                 }
             }
@@ -194,15 +193,14 @@ namespace TextComposing.IO
             return false;
         }
 
-        private Formatting.ParagraphModel BuildParagraph(UString line, bool isSetIndent, int textIndent, int paragraphIndent)
+        private Formatting.ParagraphModel BuildParagraph(UString line, int textIndent, int paragraphIndent)
         {
             var exchangableText = _converter.Convert(line);
             var paragraphStyle = new ParagraphStyle
             {
                 FontSize = _fontSizeByPoint,
                 RubyFontSizeRatio = 0.5F, //TODO: 共通化が必要
-                Indent = (isSetIndent ? new ManualParagraphIndentStyle(textIndent, paragraphIndent) :
-                    (IParagraphIndentStyle)new AutoParagraphIndentStyle())
+                Indent = new ManualParagraphIndentStyle(textIndent, paragraphIndent)
             };
             var paragraph = _exchangableTextImporter.Import(exchangableText, paragraphStyle);
             return paragraph;

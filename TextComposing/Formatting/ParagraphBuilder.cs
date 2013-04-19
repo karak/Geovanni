@@ -102,8 +102,7 @@ namespace TextComposing.Formatting
                 {
                     if (IsParagraphHead())
                     {
-                        AppendHeadGlueJP(letter);
-                        //TODO: 欧文パラグラフインデント
+                        AppendHeadIndentGlue(letter);
                     }
                     else
                     {
@@ -113,6 +112,10 @@ namespace TextComposing.Formatting
                 }
                 else
                 {
+                    if (IsParagraphHead())
+                    {
+                        AppendHeadIndentGlue(letter);
+                    }
                     _lastLetter = letter;
                     _lastLetterZwSize = _currentZwSize;
                 }
@@ -188,7 +191,7 @@ namespace TextComposing.Formatting
                 _buffer.Add(new JapaneseInterletterspace(glue, beforeGlue, indent, isProhibited));
             }
 
-            private void AppendHeadGlueJP(UChar letter)
+            private void AppendHeadIndentGlue(UChar letter)
             {
                 var indent = _advancing.FirstLineIndent(letter, _currentZwSize);
                 _buffer.Add(new ParagraphHeadIndent(indent));

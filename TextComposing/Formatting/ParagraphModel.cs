@@ -102,6 +102,11 @@ namespace TextComposing.Formatting
             var factory = new UnjustifiedLineBuilder(_objectList);
             return factory.CreateLine(constraint, style, from, to, out newStyle);
         }
+
+        public override string ToString()
+        {
+            return String.Join("", (object[])_objectList);
+        }
     }
 }
 

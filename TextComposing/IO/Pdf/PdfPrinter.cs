@@ -23,6 +23,7 @@ namespace TextComposing.IO.Pdf
         bool _isPsuedoVertical;
         private BaseFont _latinFont;
         private float _latinBaselineOffsetRatio;
+        private BaseFont _nombreFont;
         private BaseFont _symbolFont;
         private readonly float _initialX;
         private readonly float _initialXMirrored;
@@ -60,6 +61,7 @@ namespace TextComposing.IO.Pdf
             _headerFont = fontSetting.Font.CreateBaseFont(RunDirection.Horizontal, true);
             _latinFont = fontSetting.LatinFont.CreateBaseFont(RunDirection.Horizontal, true);
             _latinBaselineOffsetRatio = fontSetting.LatinBaselineOffsetRatio;
+            _nombreFont = fontSetting.LatinFont.CreateBaseFont(RunDirection.Horizontal, true);
             _symbolFont = fontSetting.SymbolFont.CreateBaseFont(RunDirection.Vertical, false);
             _doc = new Document(pdfPageSize);
             _isMirrorEnabled = layout.Mirroring;
@@ -110,7 +112,7 @@ namespace TextComposing.IO.Pdf
 
                 //page number
                 var pageNumberString = _pageNumber.ToString();
-                cb.SetFontAndSize(_headerFont, _pageFontSize);
+                cb.SetFontAndSize(_nombreFont, _pageFontSize);
                 cb.BeginText();
                 if (!_isMirrorEnabled || IsLeftPage)
                 {

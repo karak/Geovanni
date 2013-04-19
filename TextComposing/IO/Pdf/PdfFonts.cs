@@ -101,6 +101,11 @@ namespace TextComposing.IO.Pdf
         public Pdf.IPdfFontFamily LatinFont { get; set; }
 
         /// <summary>
+        /// ページ番号フォント（横書き）
+        /// </summary>
+        public Pdf.IPdfFontFamily NombreFont { get; set; }
+
+        /// <summary>
         /// 欧文フォント使用時をベースラインから上にフォントサイズの何倍ずらすか
         /// </summary>
         public float LatinBaselineOffsetRatio { get; set; }

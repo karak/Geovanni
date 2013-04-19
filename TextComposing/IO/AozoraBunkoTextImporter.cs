@@ -116,10 +116,29 @@ namespace TextComposing.IO
                 _fontSizeByPoint = value;
             }
         }
+        public class MetaData
+        {
+            public UString Title = UString.Empty;
+            public UString[] Authors = new UString[0];
+        }
 
         public IEnumerable<IParagraphModel> Import(string text)
         {
             return Import(text.Split('\n'));
+        }
+
+        public MetaData GetMetaData(IEnumerable<string> lines)
+        {
+            int startIndex;
+            MetaData metaData = new MetaData();
+            if (ParseHeaderPart(lines, out startIndex, out metaData.Title, out metaData.Authors))
+            {
+                return metaData;
+            }
+            else
+            {
+                return metaData;
+            }
         }
 
         public IEnumerable<IParagraphModel> Import(IEnumerable<string> lines)
@@ -127,13 +146,7 @@ namespace TextComposing.IO
             _isFrozen = true;
             try
             {
-                int startIndex;
-                string title;
-                string[] authors;
-                if (ParseHeaderPart(lines, out startIndex, out title, out authors))
-                {
-                    ;
-                }
+                int startIndex = GetStartLineIndex(lines);
                 var indentParser = new IndentParser();
                 foreach (string line in indentParser.ReadLines(lines.Skip(startIndex)))
                 {
@@ -149,14 +162,30 @@ namespace TextComposing.IO
             }
         }
 
+        private static int GetStartLineIndex(IEnumerable<string> lines)
+        {
+            int startIndex;
+
+            UString title;
+            UString[] authors;
+            if (ParseHeaderPart(lines, out startIndex, out title, out authors))
+            {
+                ;
+            }
+            return startIndex;
+        }
+
         private const string ruler = "-------------------------------------------------------";
 
-        private static bool ParseHeaderPart(IEnumerable<string> lines, out int startIndex, out string title, out string[] authors)
+        private static bool ParseHeaderPart(IEnumerable<string> lines, out int startIndex, out UString title, out UString[] authors)
         {
-            string titleBuffer = "";
-            List<string> authorsBuffer = new List<string>(4);
+            UString titleBuffer = UString.Empty;
+            List<UString> authorsBuffer = new List<UString>(4);
+
+            int startIndexBuffer = 0;
             int foundCount = 0;
             int lineIndex = 0;
+            bool found = false;
             foreach (var line in lines)
             {
                 if (line == ruler)
@@ -167,30 +196,32 @@ namespace TextComposing.IO
                 {
                     if (lineIndex == 0)
                     {
-                        titleBuffer = line.TrimStart('　'); ;
+                        titleBuffer = new UString(line.TrimStart('　'));
                     }
                     else if (line.Length > 0)
                     {
-                        authorsBuffer.Add(line.TrimStart('　'));
+                        authorsBuffer.Add(new UString(line.TrimStart('　')));
                     }
                 }
 
-                if (foundCount == 2) {
-                    startIndex = lineIndex + 1;
-                    title = titleBuffer;
-                    authors = authorsBuffer.ToArray();
-                    return true;
+                if (foundCount == 2)
+                {
+                    //found
+                    startIndexBuffer = lineIndex + 1;
+                    found = true;
+                    break;
                 }
                 else if (lineIndex >= 40)
                 {
+                    //not found
                     break;
                 }
                 ++lineIndex;
             }
-            startIndex = 0;
-            title = null;
-            authors = null;
-            return false;
+            startIndex = startIndexBuffer;
+            title = titleBuffer;
+            authors = authorsBuffer.ToArray();
+            return found;
         }
 
         private Formatting.ParagraphModel BuildParagraph(UString line, int textIndent, int paragraphIndent)

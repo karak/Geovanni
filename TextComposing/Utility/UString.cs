@@ -53,7 +53,14 @@ namespace TextComposing
 
     public class UString : IEnumerable<UChar>
     {
+        public static readonly UString Empty = new UString();
+
         private StringInfo _info;
+
+        public UString() : this(String.Empty)
+        {
+            
+        }
 
         public UString(string source)
         {

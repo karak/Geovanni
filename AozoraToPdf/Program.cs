@@ -70,7 +70,7 @@ namespace AozoraToPdf
             WritePdf(aozoraText, options.Output, title, layout);
         }
 
-        private static void WritePdf(IEnumerable<string> aozoraText, string output, UString title, Layout layout)
+        private static void WritePdf(IEnumerable<string> aozoraText, string output, UString optionalTitle, Layout layout)
         {
             ILatinWordMetric latinMetric = new PdfLatinWordMetric(fontSetting.LatinFont, layout.FontSize);
             var engine = new LayoutEngine(layout, latinMetric);
@@ -80,7 +80,7 @@ namespace AozoraToPdf
             using (printer)
             {
                 printer.FontSize = layout.FontSize;
-                printer.Header = title;
+                printer.Header = optionalTitle.Length > 0? optionalTitle : new UString(document.Title);
                 printer.Connect();
                 document.PrintBy(printer);
             }

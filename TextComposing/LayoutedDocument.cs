@@ -6,15 +6,22 @@ namespace TextComposing
 {
     internal class LayoutedDocument : Printing.IPrintableDocument
     {
+        private UString _title;
         private Printing.IPrintableLine[] _lines;
         private readonly float _leading;
         private readonly int _numberOfLines;
 
-        public LayoutedDocument(Printing.IPrintableLine[] lines, float leading, int numberOfLines)
+        public LayoutedDocument(UString title, Printing.IPrintableLine[] lines, float leading, int numberOfLines)
         {
+            _title = title;
             _lines = lines;
             _leading = leading;
             _numberOfLines = numberOfLines;
+        }
+
+        public UString Title
+        {
+            get { return _title; }
         }
 
         void Printing.IPrintable.PrintBy(Printing.IPrinter printer)

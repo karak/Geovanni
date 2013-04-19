@@ -24,12 +24,13 @@ namespace TextComposing
 
             var importer = new IO.AozoraBunkoTextImporter(_latinWordMetric);
             importer.FontSizeByPoint = _setting.FontSize;
+            var metaData = importer.GetMetaData(aozoraText);
             var paragraphs = importer.Import(aozoraText);
             var solver = new Solver();
 
             var printableLines = solver.Layout(paragraphs, LineBreaking.Frame.Constant(contentHeight));
             paragraphs = null;
-            return new LayoutedDocument(printableLines, _setting.Leading, _setting.NumberOfLines);
+            return new LayoutedDocument(metaData.Title, printableLines, _setting.Leading, _setting.NumberOfLines);
         }
     }
 }

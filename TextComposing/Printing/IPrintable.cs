@@ -15,5 +15,6 @@ namespace TextComposing.Printing
 
     public interface IPrintableDocument : IPrintable
     {
+        UString Title { get; }
     }
 }

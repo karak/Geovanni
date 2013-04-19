@@ -72,7 +72,7 @@ namespace TextComposing.IO.Pdf
             _pageHeaderOffset = layout.PageHeaderOffset;
             _writer = PdfWriter.GetInstance(_doc, new FileStream(path, FileMode.Create));
             _writer.RunDirection = PdfWriter.RUN_DIRECTION_RTL;
-            _writer.ViewerPreferences = PdfWriter.DirectionR2L | (layout.Mirroring? PdfWriter.PageLayoutTwoPageLeft : 0);
+            _writer.ViewerPreferences = PdfWriter.DirectionR2L | (layout.Mirroring ? PdfWriter.PageLayoutTwoPageRight : 0);
             _writer.SetFullCompression();
             _fontSizeChanged = true;
             _pageNumber = 0;

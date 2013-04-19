@@ -134,6 +134,7 @@ namespace TextComposing.IO.Pdf
                     {
                         cb.BeginText();
                         cb.SetTextMatrix(_writer.PageSize.Width - _pageX + _pageHeaderOffset, _pageY);
+                        cb.SetFontAndSize(_headerFont, _pageFontSize);
                         var latinMode = new LatinMode();
                         latinMode.Flush += (sender, e) =>
                         {
@@ -141,13 +142,16 @@ namespace TextComposing.IO.Pdf
                             //TODO: _latinBaselineOffsetRatio;
                             cb.ShowText(e.LatinText.String);
                             cb.SetFontAndSize(_headerFont, _pageFontSize);
-
+                            cb.SetFontAndSize(_headerFont, _pageFontSize);
                         };
+
                         foreach (var ch in _headerStringLeft)
                         {
                             latinMode.Send(ch);
                             if (latinMode.CurrentLang != Lang.Latin)
+                            {
                                 cb.ShowText(ch.ToString()); //TODO: こちらもバッファリング latinMode と呼ばれてるオブジェクトで
+                            }
                         }
                         latinMode.ForceFlush();
                         cb.EndText();

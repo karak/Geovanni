@@ -27,6 +27,12 @@ namespace TextComposing.IO.Exchange
 
         public void Ruby(int start, int end, UString rubyText)
         {
+            if (start >= end)
+            {
+                Console.WriteLine("WARNING: ルビの親文字が空です（{0}文字目／{1}）", start + 1, _textBuffer.ToString());
+                return;
+            }
+
             Upsert(start, MetaInfo.RUBY_START, rubyText);
             Upsert(end, MetaInfo.RUBY_END);
         }
@@ -48,6 +54,10 @@ namespace TextComposing.IO.Exchange
             existing.Flags |= flag;
             if (flag == MetaInfo.RUBY_START)
             {
+                if (rubyText == null)
+                {
+                    throw new ArgumentNullException("rubyText");
+                }
                 existing.RubyText = rubyText;
             }
         }
@@ -57,10 +67,6 @@ namespace TextComposing.IO.Exchange
             int index = 0;
             foreach (var letter in _textBuffer.ToUString())
             {
-                if (index == 19)
-                {
-                    ;
-                }
                 VisitAt(index, visitor);
                 visitor.Letter(letter);
                 ++index;

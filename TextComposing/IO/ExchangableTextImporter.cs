@@ -67,6 +67,8 @@ namespace TextComposing.IO
 
             void IExchangableTextVisitor.RubyEnd()
             {
+                if (!_inRuby) throw new Exception("Not in ruby text yet");
+
                 _builder.TextWithGroupRuby(_rubyBaseText.ToUString(), _rubyText);
 
                 _rubyBaseText.Clear();

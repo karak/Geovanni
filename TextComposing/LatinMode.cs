@@ -49,7 +49,7 @@ namespace TextComposing
 
         private static Lang JudgeLang(UChar letter)
         {
-            if (CC.IsLatin(letter) || new UString(":;.,-!?\"' ").Contains(letter)) //TODO: 半角空白はここでやるべきか？
+            if (CC.IsLatin(letter) || letter.IsAscii) //TODO: 半角空白はここでやるべきか？
             {
                 return Lang.Latin;
             }

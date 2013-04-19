@@ -165,6 +165,15 @@ namespace TextComposing
             get { return _codePoint; }
         }
 
+        public bool IsAscii
+        {
+            get
+            {
+                string str = this.ToString();
+                return (str.Length == 1 && (int)str[0] < 256);
+            }
+        }
+
         public override bool Equals(object value)
         {
             var casted = value as UChar?;

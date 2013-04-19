@@ -8,8 +8,8 @@ namespace TextComposing.IO.AozoraBunko.Lexers
     /// </summary>
     internal static partial class ExternalCharacterDictionary
     {
-        private static System.Text.RegularExpressions.Regex _twoIdeograph =
-            new System.Text.RegularExpressions.Regex(@"^二の字点、(面区点番号)?1-2-22$");
+        private static System.Text.RegularExpressions.Regex _specialChars =
+            new System.Text.RegularExpressions.Regex(@"^[二の字点|ます記号|コト|より|歌記号|濁点付き平仮名う|濁点付き片仮名ヰ|濁点付き片仮名ヱ|濁点付き片仮名ヲ|感嘆符二つ|疑問符二つ|疑問符感嘆符|感嘆符疑問符|ローマ数字1小文字|ローマ数字1|丸1|ファイナルシグマ]、(面区点番号)?(\d+)-(\d+)-(\d+)$");
         private static System.Text.RegularExpressions.Regex _jisX0123 =
             new System.Text.RegularExpressions.Regex(@"^「[^」]+」、(第[34]水準)?(\d+)-(\d+)-(\d+)$");
         private static System.Text.RegularExpressions.Regex _unicode =
@@ -19,7 +19,7 @@ namespace TextComposing.IO.AozoraBunko.Lexers
         {
             if (DoesMatchJisX0123(annotationText, out unicodeChar) ||
                 DoesMatchUnicode(annotationText, out unicodeChar) ||
-                DoesMatchTwoIdeograph(annotationText, out unicodeChar))
+                DoesMatchSpecialChars(annotationText, out unicodeChar))
             {
                 return true;
             }
@@ -30,15 +30,18 @@ namespace TextComposing.IO.AozoraBunko.Lexers
         }
 
         /// <summary>
-        /// 二の字点
+        /// 二の字点などの特殊仮名、記号
         /// </summary>
-        private static bool DoesMatchTwoIdeograph(string annotationText, out string unicodeChar)
+        private static bool DoesMatchSpecialChars(string annotationText, out string unicodeChar)
         {
-            var match = _twoIdeograph.Match(annotationText);
+            var match = _specialChars.Match(annotationText);
             if (match.Success)
             {
-                unicodeChar = "\u303B";
-                return true;
+                //面区点
+                var plane = Byte.Parse(match.Groups[2].Value);
+                var row = Byte.Parse(match.Groups[3].Value);
+                var cell = Byte.Parse(match.Groups[4].Value);
+                return Jis2Ucs(plane, row, cell, out unicodeChar);
             }
             else
             {
@@ -58,21 +61,26 @@ namespace TextComposing.IO.AozoraBunko.Lexers
                 var plane = Byte.Parse(match.Groups[2].Value);
                 var row = Byte.Parse(match.Groups[3].Value);
                 var cell = Byte.Parse(match.Groups[4].Value);
-                int code = JisX213.ToUcs(plane, row, cell);
-                if (code == -1)
-                {
-                    //未対応
-                    unicodeChar = default(string);
-                    return false;
-                }
-                unicodeChar = Char.ConvertFromUtf32(code);
-                return true;
+                return Jis2Ucs(plane, row, cell, out unicodeChar);
             }
             else
             {
                 unicodeChar = default(string);
                 return false;
             }
+        }
+
+        private static bool Jis2Ucs(byte plane, byte row, byte cell, out string unicodeChar)
+        {
+            int code = JisX213.ToUcs(plane, row, cell);
+            if (code == -1)
+            {
+                //未対応
+                unicodeChar = default(string);
+                return false;
+            }
+            unicodeChar = Char.ConvertFromUtf32(code);
+            return true;
         }
 
         /// <summary>

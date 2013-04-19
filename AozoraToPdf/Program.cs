@@ -30,7 +30,8 @@ namespace AozoraToPdf
             //Font = PdfFontFamily.HiraginoMincho,
             //Font = PdfFontFamily.IwataMinchoOld,
             Font = PdfFontFamily.KozukaMincho,
-            LatinFont = PdfFontFamily.EBGaramond,
+            //LatinFont = PdfFontFamily.EBGaramond,
+            LatinFont = PdfFontFamily.TimesRoman,
             LatinBaselineOffsetRatio = 0.20F,
             SymbolFont = PdfFontFamily.MSMincho
         };

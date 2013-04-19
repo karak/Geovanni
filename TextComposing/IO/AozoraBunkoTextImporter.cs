@@ -15,7 +15,7 @@ namespace TextComposing.IO
             var buffer = new FormattedTextBuffer();
             var visitor = CreateTokenVisitor(buffer);
 
-            foreach (var token in RubyParser.Parse(ApplyLexers(line)))
+            foreach (var token in RubyParser.Parse(line))
             {
                 token.Accept(visitor);
             }
@@ -66,30 +66,8 @@ namespace TextComposing.IO
             };
             return visitor;
         }
-
-        private static IEnumerable<UChar> ApplyLexers(UString line)
-        {
-            Filter f = Compose(
-                ExternalCharacterParser.Filter,
-                AccentNotationParser.Filter,
-                EmDashReplacer.Filter,
-                KanaRepeatingMarkParser.Filter,
-                InterletterSpaceRemover.Filter); //TODO: remove ではなく、書式オブジェクトに置き換える。場所ももっと後、（和文区切り文字の後）と（和文欧文間）
-            return f(line);
-        }
-
-        private delegate IEnumerable<UChar> Filter(IEnumerable<UChar> cs);
-
-        private static Filter Compose(params Filter[] fs)
-        {
-            return cs =>
-            {
-                foreach (var f in fs)
-                    cs = f(cs);
-                return cs;
-            };
-        }
     }
+
     public class AozoraBunkoTextImporter
     {
         private bool _isFrozen = false;
@@ -196,11 +174,11 @@ namespace TextComposing.IO
                 {
                     if (lineIndex == 0)
                     {
-                        titleBuffer = new UString(line.TrimStart('　'));
+                        titleBuffer = ApplyLexers(new UString(line.TrimStart('　')));
                     }
                     else if (line.Length > 0)
                     {
-                        authorsBuffer.Add(new UString(line.TrimStart('　')));
+                        authorsBuffer.Add(ApplyLexers(new UString(line.TrimStart('　'))));
                     }
                 }
 
@@ -226,6 +204,7 @@ namespace TextComposing.IO
 
         private Formatting.ParagraphModel BuildParagraph(UString line, int textIndent, int paragraphIndent)
         {
+            line = ApplyLexers(line);
             var exchangableText = _converter.Convert(line);
             var paragraphStyle = new ParagraphStyle
             {
@@ -235,6 +214,29 @@ namespace TextComposing.IO
             };
             var paragraph = _exchangableTextImporter.Import(exchangableText, paragraphStyle);
             return paragraph;
+        }
+
+        private static UString ApplyLexers(UString line)
+        {
+            Filter f = Compose(
+                ExternalCharacterParser.Filter,
+                AccentNotationParser.Filter,
+                EmDashReplacer.Filter,
+                KanaRepeatingMarkParser.Filter,
+                InterletterSpaceRemover.Filter); //TODO: remove ではなく、書式オブジェクトに置き換える。場所ももっと後、（和文区切り文字の後）と（和文欧文間）
+            return new UString(f(line));
+        }
+
+        private delegate IEnumerable<UChar> Filter(IEnumerable<UChar> cs);
+
+        private static Filter Compose(params Filter[] fs)
+        {
+            return cs =>
+            {
+                foreach (var f in fs)
+                    cs = f(cs);
+                return cs;
+            };
         }
     }
 }

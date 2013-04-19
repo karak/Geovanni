@@ -39,7 +39,7 @@ namespace TextComposing
             TopMargin = 55,
             PageNumberRightMargin = 32,
             PageNumberTopMargin = 30,
-            PageHeaderOffset = 40,
+            PageHeaderOffset = 12.0F * (1.6F * 2),
             NumberOfLines = 17,
             NumberOfRows = 40,
             FontSize = 12.0F,

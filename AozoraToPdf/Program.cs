@@ -15,10 +15,6 @@ namespace AozoraToPdf
         public string Input { get; set; }
         [DefaultValue(null)]
         public string Output { get; set; }
-        [DefaultValue("")]
-        public string Title { get; set; }
-        [DefaultValue(false)]
-        public bool TitleExternalChar { get; set; }
         [DefaultValue("a5pocket")]
         public string Layout { get; set; }
     }
@@ -30,10 +26,11 @@ namespace AozoraToPdf
             //Font = PdfFontFamily.HiraginoMincho,
             //Font = PdfFontFamily.IwataMinchoOld,
             Font = PdfFontFamily.KozukaMincho,
-            //LatinFont = PdfFontFamily.EBGaramond,
-            LatinFont = PdfFontFamily.TimesRoman,
+            LatinFont = PdfFontFamily.EBGaramond,
+            //LatinFont = PdfFontFamily.TimesRoman,
             LatinBaselineOffsetRatio = 0.20F,
-            NombreFont = PdfFontFamily.KozukaMincho,
+            NombreFont = PdfFontFamily.EBGaramond,
+            //LatinFont = PdfFontFamily.TimesRoman,
             SymbolFont = PdfFontFamily.MSMincho
         };
 
@@ -50,8 +47,6 @@ namespace AozoraToPdf
                 Console.WriteLine(@"Options:
 --input=<aozorabunko text file>(required)
 --output=<pdf file> (default: equal to input's extension is replaced by "".pdf""
---title=<title of your book> (default:"""")
---title-external-char enable replace external chars and accent decomposition also in title
 --layout=a5pocket|a4manuscript (defult:a5pocket)");
                 return;
             }
@@ -60,17 +55,12 @@ namespace AozoraToPdf
                 options.Output = System.IO.Path.ChangeExtension(options.Input, ".pdf");
             }
 
-            UString title = new UString(options.Title);
-            if (options.TitleExternalChar)
-            {
-                title = new UString(AccentNotationParser.Filter(ExternalCharacterParser.Filter(title)));
-            }
             var aozoraText = ReadFromFile(options.Input);
             var layout = (options.Layout == "a4manuscript"?  Layout.A4Manuscript :  Layout.A5Pocket);
-            WritePdf(aozoraText, options.Output, title, layout);
+            WritePdf(aozoraText, options.Output, layout);
         }
 
-        private static void WritePdf(IEnumerable<string> aozoraText, string output, UString optionalTitle, Layout layout)
+        private static void WritePdf(IEnumerable<string> aozoraText, string output, Layout layout)
         {
             ILatinWordMetric latinMetric = new PdfLatinWordMetric(fontSetting.LatinFont, layout.FontSize);
             var engine = new LayoutEngine(layout, latinMetric);
@@ -80,7 +70,7 @@ namespace AozoraToPdf
             using (printer)
             {
                 printer.FontSize = layout.FontSize;
-                printer.Header = optionalTitle.Length > 0? optionalTitle : new UString(document.Title);
+                printer.Header = document.Title;
                 printer.Connect();
                 document.PrintBy(printer);
             }

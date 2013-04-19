@@ -103,6 +103,18 @@ namespace TextComposing.IO.AozoraBunko.Lexers
                                 yield return UChar.FromCodePoint(0x006E);
                                 yield return UChar.FromCodePoint(0x0302);
                                 break;
+                            case 0x004F: //'O'
+                                yield return UChar.FromCodePoint(0x00D4);
+                                break;
+                            case 0x006F: //'o'
+                                yield return UChar.FromCodePoint(0x00F4);
+                                break;
+                            case 0x0053: //'S'
+                                yield return UChar.FromCodePoint(0x015C);
+                                break;
+                            case 0x0073: //'s'
+                                yield return UChar.FromCodePoint(0x015D);
+                                break;
                             case 0x0057: //'W'
                                 yield return UChar.FromCodePoint(0x0174);
                                 break;

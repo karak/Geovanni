@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using CC = TextComposing.CharacterClasses;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
 using iTextPageSize = iTextSharp.text.PageSize;
@@ -142,7 +143,6 @@ namespace TextComposing.IO.Pdf
                             //TODO: _latinBaselineOffsetRatio;
                             cb.ShowText(e.LatinText.String);
                             cb.SetFontAndSize(_headerFont, _pageFontSize);
-                            cb.SetFontAndSize(_headerFont, _pageFontSize);
                         };
 
                         foreach (var ch in _headerStringLeft)
@@ -257,22 +257,21 @@ namespace TextComposing.IO.Pdf
 
         private void SetAppropriateTextMatrix(UChar letter, float voffset, PdfContentByte cb)
         {
-            //TODO: 毎回 UString 作らない UChar[] で持つ。
             var ytlm = MyYTLM;
             if (_isPsuedoVertical)
             {
-                if (TextComposing.CharacterClasses.Cl06(letter) ||
-                    TextComposing.CharacterClasses.Cl07(letter))
+                if (CC.Cl06(letter) ||
+                    CC.Cl07(letter))
                 {
                     //句読点を平行移動。
-                    cb.SetTextMatrix(_xtlm + _fontSize * (1F / 2F + 1 / 8F), ytlm + _fontSize / 2 + voffset);
+                    cb.SetTextMatrix(_xtlm + _fontSize * (1F / 2 + 1F / 8), ytlm + _fontSize * (1F / 2 + 1F / 8) + voffset);
                 }
-                else if (TextComposing.CharacterClasses.Cl11(letter))
+                else if (CC.Cl11(letter))
                 {
                     //小書きの仮名を平行移動。
                     cb.SetTextMatrix(_xtlm + _fontSize / 8, ytlm + _fontSize / 8 + voffset);
                 }
-                else if (TextComposing.CharacterClasses.Cl01(letter))
+                else if (CC.Cl01(letter))
                 {
                     //始め括弧を回転、平行移動
                     cb.SetTextMatrix(0F, -1F, 1F, 0F, _xtlm + _fontSize / 2, ytlm);
@@ -287,10 +286,11 @@ namespace TextComposing.IO.Pdf
                     //エムダッシュを回転
                     cb.SetTextMatrix(0F, -1F, 1F, 0F, _xtlm + _fontSize * (1F / 2F + 1 / 8F), ytlm - _fontSize / 2);
                 }
+                //TODO: 毎回 UString 作らない UChar[] で持つ。
                 else if (
-                    TextComposing.CharacterClasses.Cl02(letter) ||
+                    CC.Cl02(letter) ||
                     (new UString("―…‥").Contains(letter)) || //part of Cl08
-                    TextComposing.CharacterClasses.Cl10(letter) ||
+                    CC.Cl10(letter) ||
                     (new UString("～＋±＝－÷≠：；‘’“”＜＞≦≧＿｜→↓←↑⇒⇔").Contains(letter))) //その他転置すべき記号。よく使いそうなものだけ
                 {
                     //それ以外の記号を回転

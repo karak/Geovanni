@@ -214,6 +214,7 @@ namespace TextComposing.IO.AozoraBunko.Lexers
                     }
                     else if (c == atmark && prev.CodePoint == 0x003F)
                     {
+                        //INVERTED QUESTION MARK
                         yield return UChar.FromCodePoint(0x00BF);
                         prev = nul;
                     }

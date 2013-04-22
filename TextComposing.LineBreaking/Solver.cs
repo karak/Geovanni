@@ -48,14 +48,15 @@ namespace TextComposing.LineBreaking
         private readonly double _tolerance = 1;
         private Evaluator<TLine> _evaluator = new Evaluator<TLine>();
 
-        public TLine[] Layout(IEnumerable<IParagraphModel<TLine, TState>> paragraphs, IFrameModel frame)
+        public IEnumerable<TLine> Layout(IEnumerable<IParagraphModel<TLine, TState>> paragraphs, IFrameModel frame)
         {
-            var buffer = new List<TLine>(1024);
             foreach (var p in paragraphs)
             {
-                buffer.AddRange(Layout(p, frame));
+                foreach (var l in Layout(p, frame))
+                {
+                    yield return l;
+                }
             }
-            return buffer.ToArray();
         }
 
         public IEnumerable<TLine> Layout(IParagraphModel<TLine, TState> paragraph, IFrameModel frame)

@@ -17,7 +17,7 @@ namespace TextComposing
             _setting = setting;
             _latinWordMetric = latinWordMetric;
         }
-
+        //TODO: ConnectTo(IPrinter) インターフェースにする。
         public Printing.IPrintableDocument Compose(IEnumerable<string> aozoraText)
         {
             float contentHeight = _setting.FontSize * _setting.NumberOfRows;
@@ -30,7 +30,7 @@ namespace TextComposing
 
             var printableLines = solver.Layout(paragraphs, LineBreaking.Frame.Constant(contentHeight));
             paragraphs = null;
-            return new LayoutedDocument(metaData.Title, printableLines, _setting.Leading, _setting.NumberOfLines);
+            return new DynamicLayoutingData(metaData.Title, printableLines, _setting.Leading, _setting.NumberOfLines);
         }
     }
 }

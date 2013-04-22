@@ -67,22 +67,17 @@ namespace AozoraToPdf
             }
             var aozoraText = ReadFromFile(options.Input);
             var layout = (options.Layout == "a4manuscript"?  Layout.A4Manuscript :  Layout.A5Pocket);
-            WritePdf(aozoraText, options.Output, title, layout);
+            WritePdf(aozoraText, options.Output, layout);
         }
 
-        private static void WritePdf(IEnumerable<string> aozoraText, string output, UString optionalTitle, Layout layout)
+        private static void WritePdf(IEnumerable<string> aozoraText, string output, Layout layout)
         {
             ILatinWordMetric latinMetric = new PdfLatinWordMetric(fontSetting.LatinFont, layout.FontSize);
             var engine = new LayoutEngine(layout, latinMetric);
-            var document = engine.Compose(aozoraText);
-
             var printer = new PdfPrinter(output, layout, fontSetting);
             using (printer)
             {
-                printer.FontSize = layout.FontSize;
-                printer.Header = optionalTitle.Length > 0? optionalTitle : new UString(document.Title);
-                printer.Connect();
-                document.PrintBy(printer);
+                engine.SendTo(aozoraText, printer);
             }
         }
 

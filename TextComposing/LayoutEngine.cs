@@ -17,8 +17,19 @@ namespace TextComposing
             _setting = setting;
             _latinWordMetric = latinWordMetric;
         }
-        //TODO: ConnectTo(IPrinter) インターフェースにする。
-        public Printing.IPrintableDocument Compose(IEnumerable<string> aozoraText)
+
+        public void SendTo(IEnumerable<string> aozoraText, TextComposing.IO.Pdf.PdfPrinter printer)
+        {
+            printer.FontSize = _setting.FontSize;
+            var document = this.Compose(aozoraText);
+            printer.Header = document.Title;
+
+            printer.Connect();
+            document.PrintBy(printer);
+
+        }
+
+        private Printing.IPrintableDocument Compose(IEnumerable<string> aozoraText)
         {
             float contentHeight = _setting.FontSize * _setting.NumberOfRows;
 

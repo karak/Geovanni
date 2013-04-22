@@ -11,6 +11,7 @@ namespace TextComposing.IO.Pdf
 {
     public class PdfPrinter : Printing.IPrinter, IDisposable
     {
+        private PdfOutlineBuilder _outlineBuilder = new PdfOutlineBuilder();
         private EmdashRenderer _emdashRenderer = new EmdashRenderer();
 
 
@@ -200,6 +201,11 @@ namespace TextComposing.IO.Pdf
             if (_doc.IsOpen())
             {
                 EndPage();
+
+                PdfContentByte cb = _writer.DirectContent;
+                PdfOutline root = cb.RootOutline;
+                _outlineBuilder.GenerateTo(root);
+                _outlineBuilder.Clear();
                 _doc.Close();
             }
         }
@@ -346,6 +352,15 @@ namespace TextComposing.IO.Pdf
             EndPage();
             _doc.NewPage();
             BeginPage();
+
+#if false
+            //TEST outline generation!
+            var cb = _writer.DirectContent;
+            string path = _outlineBuilder.AppendOutline(1, "Page Break(TEST)");
+            //TODO: no effect! Does PdfDocument have valid destination?
+            var destination = new PdfDestination(PdfDestination.FIT, 0, 0, 0, 0);
+            var added = cb.LocalDestination(path, destination);
+#endif
             //TODO: ページ先頭なら改ページなし
             //TODO: 改丁（両開き時のみ）
         }

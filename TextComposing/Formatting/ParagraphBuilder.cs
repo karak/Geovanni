@@ -121,9 +121,17 @@ namespace TextComposing.Formatting
                 }
             }
 
+            public void EndOfLine()
+            {
+                var lastGlue = _advancing.LineTailGlueJP(_lastLetter, _lastLetterZwSize);
+                _buffer.Add(new JapaneseEndOfLineSpace(lastGlue));
+                _lastLetter = default(UChar);
+                _lastLetterZwSize = 0F;
+            }
+
             private static LatinWord space = new LatinWord(new UString(" "), 0.5f);
 
-            void _latinMode_Flush(object sender, LatinMode.FlushEventArgs e)
+            private void _latinMode_Flush(object sender, LatinMode.FlushEventArgs e)
             {
                 var wordBuffer = new UStringBuilder(16);
                 var latinText = e.LatinText;
@@ -134,12 +142,6 @@ namespace TextComposing.Formatting
                         FlushLatinWord(wordBuffer);
 
                         _buffer.Add(new LatinInterwordSpace(new GlueProperty(0.5F * _currentZwSize, 0.2F * _currentZwSize, 0.25F * _currentZwSize)));
-                        /*
-                        _buffer.Add(new JapaneseInterletterspace(
-                            new GlueProperty(1F / 4 * _currentZwSize, 1F / 4 * _currentZwSize, 1F / 8 * _currentZwSize),
-                            default(GlueProperty),
-                            0F,
-                            false));*/
                     }
                     else
                     {
@@ -161,7 +163,7 @@ namespace TextComposing.Formatting
                 }
             }
 
-            void _latinMode_BeforeLangChange(object sender, LatinMode.LangChangeEventArgs e)
+            private void _latinMode_BeforeLangChange(object sender, LatinMode.LangChangeEventArgs e)
             {
                 if ((e.New == Lang.Latin && e.Old == Lang.Japanese) ||
                     (e.New == Lang.Japanese && e.Old == Lang.Latin))
@@ -177,7 +179,7 @@ namespace TextComposing.Formatting
                 }
             }
 
-            void FlushLatinBuffer()
+            private void FlushLatinBuffer()
             {
                 _latinMode.ForceFlush();
             }
@@ -257,6 +259,7 @@ namespace TextComposing.Formatting
 
         public ParagraphModel EndParagraph()
         {
+            _buffer.EndOfLine();
             var retval = new ParagraphModel(_buffer.ToArray());
             _buffer.Clear();
             _buffer = null;

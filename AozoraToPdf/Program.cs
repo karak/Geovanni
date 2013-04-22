@@ -64,15 +64,10 @@ namespace AozoraToPdf
         {
             ILatinWordMetric latinMetric = new PdfLatinWordMetric(fontSetting.LatinFont, layout.FontSize);
             var engine = new LayoutEngine(layout, latinMetric);
-            var document = engine.Compose(aozoraText);
-
             var printer = new PdfPrinter(output, layout, fontSetting);
             using (printer)
             {
-                printer.FontSize = layout.FontSize;
-                printer.Header = document.Title;
-                printer.Connect();
-                document.PrintBy(printer);
+                engine.SendTo(aozoraText, printer);
             }
         }
 

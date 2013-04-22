@@ -9,7 +9,7 @@ namespace TextComposing.IO.AozoraBunko.Lexers
     internal static partial class ExternalCharacterDictionary
     {
         private static System.Text.RegularExpressions.Regex _specialChars =
-            new System.Text.RegularExpressions.Regex(@"^[二の字点|ます記号|コト|より|歌記号|濁点付き平仮名う|濁点付き片仮名ヰ|濁点付き片仮名ヱ|濁点付き片仮名ヲ|感嘆符二つ|疑問符二つ|疑問符感嘆符|感嘆符疑問符|ローマ数字1小文字|ローマ数字1|丸1|ファイナルシグマ]、(面区点番号)?(\d+)-(\d+)-(\d+)$");
+            new System.Text.RegularExpressions.Regex(@"^[二の字点|ます記号|コト|より|歌記号|濁点付き平仮名う|濁点付き片仮名ヰ|濁点付き片仮名ヱ|濁点付き片仮名ヲ|感嘆符二つ|疑問符二つ|疑問符感嘆符|感嘆符疑問符|ローマ数字\d+小文字|ローマ数字\d+|丸\d+|ファイナルシグマ]、(面区点番号)?(\d+)-(\d+)-(\d+)$");
         private static System.Text.RegularExpressions.Regex _jisX0123 =
             new System.Text.RegularExpressions.Regex(@"^「[^」]+」、(第[34]水準)?(\d+)-(\d+)-(\d+)$");
         private static System.Text.RegularExpressions.Regex _unicode =
@@ -17,9 +17,9 @@ namespace TextComposing.IO.AozoraBunko.Lexers
 
         public static bool DoesMatch(string annotationText, out string unicodeChar)
         {
-            if (DoesMatchJisX0123(annotationText, out unicodeChar) ||
-                DoesMatchUnicode(annotationText, out unicodeChar) ||
-                DoesMatchSpecialChars(annotationText, out unicodeChar))
+            if (DoesMatchSpecialChars(annotationText, out unicodeChar) ||
+                DoesMatchJisX0123(annotationText, out unicodeChar) ||
+                DoesMatchUnicode(annotationText, out unicodeChar))
             {
                 return true;
             }

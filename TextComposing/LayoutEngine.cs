@@ -18,7 +18,18 @@ namespace TextComposing
             _latinWordMetric = latinWordMetric;
         }
 
-        public Printing.IPrintableDocument Compose(IEnumerable<string> aozoraText)
+        public void SendTo(IEnumerable<string> aozoraText, TextComposing.IO.Pdf.PdfPrinter printer)
+        {
+            printer.FontSize = _setting.FontSize;
+            var document = this.Compose(aozoraText);
+            printer.Header = document.Title;
+
+            printer.Connect();
+            document.PrintBy(printer);
+
+        }
+
+        private Printing.IPrintableDocument Compose(IEnumerable<string> aozoraText)
         {
             float contentHeight = _setting.FontSize * _setting.NumberOfRows;
 
@@ -30,7 +41,7 @@ namespace TextComposing
 
             var printableLines = solver.Layout(paragraphs, LineBreaking.Frame.Constant(contentHeight));
             paragraphs = null;
-            return new LayoutedDocument(metaData.Title, printableLines, _setting.Leading, _setting.NumberOfLines);
+            return new DynamicLayoutingData(metaData.Title, printableLines, _setting.Leading, _setting.NumberOfLines);
         }
     }
 }

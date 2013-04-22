@@ -164,7 +164,6 @@ namespace TextComposing.Formatting
             return new GlyphMetric(letter, zwSize).VerticalSize;
         }
 
-        // TODO: スタイルに移動
         /// <summary>
         /// 段落頭字下げ
         /// </summary>

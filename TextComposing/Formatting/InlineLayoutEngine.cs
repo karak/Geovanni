@@ -154,6 +154,11 @@ namespace TextComposing.Formatting
                 PutLetter(@object);
             }
 
+            void IFormatObjectVisitor.Visit(JapaneseEndOfLineSpace @object)
+            {
+                PutGlue(@object.FinalGlue);
+            }
+
             void IFormatObjectVisitor.Visit(LatinWord @object)
             {
                 PutLatinWordPart(@object);

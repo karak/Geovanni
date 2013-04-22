@@ -18,6 +18,7 @@ namespace TextComposing.Formatting
         void Visit(ParagraphHeadIndent @object);
         void Visit(JapaneseLetter @object);
         void Visit(JapaneseInterletterspace @object);
+        void Visit(JapaneseEndOfLineSpace @object);
         void Visit(LatinWord @object);
         void Visit(LatinInterwordSpace @object);
         void Visit(GroupRuby @object);
@@ -173,6 +174,31 @@ namespace TextComposing.Formatting
         {
             return String.Format("japanese-interletter-space:{0}/{1},{2}",
                 Glue.Length, GlueBeforeBreak.Length, IndentAfterBreak);
+        }
+    }
+    /// <summary>
+    /// 和文行末アキ
+    /// </summary>
+    /// <remarks>
+    /// 約物の後ろアキおよびぶら下げに使用。
+    /// </remarks>
+    class JapaneseEndOfLineSpace : IFormatObject
+    {
+        private readonly GlueProperty _finalGlue;
+
+        public JapaneseEndOfLineSpace(GlueProperty finalGlue)
+        {
+            _finalGlue = finalGlue;
+        }
+
+        public GlueProperty FinalGlue
+        {
+            get { return _finalGlue; }
+        }
+
+        void IFormatObject.Accept(IFormatObjectVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
     

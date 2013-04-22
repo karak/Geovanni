@@ -76,6 +76,8 @@ namespace TextComposing.Formatting
              */
             public void MoveLastLetterStateTo(TextBuffer other)
             {
+                _latinMode.ForceFlush();
+
                 other._lastLetter = _lastLetter;
                 other._lastLetterZwSize = _lastLetterZwSize;
                 _latinMode.BeforeLangChange -= this._latinMode_BeforeLangChange;

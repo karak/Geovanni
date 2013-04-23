@@ -11,11 +11,13 @@ namespace TextComposing.Formatting
     /// </summary>
     internal class JustifiedLine : Printing.IPrintableLine
     {
+        private Heading _heading;
         private InlineElement[] _texts;
 
-        internal JustifiedLine(IEnumerable<InlineElement> source)
+        internal JustifiedLine(IEnumerable<InlineElement> source, Heading heading)
         {
             _texts = source.ToArray();
+            _heading = heading;
         }
 
         public override string ToString()
@@ -25,6 +27,10 @@ namespace TextComposing.Formatting
 
         void Printing.IPrintable.PrintBy(Printing.IPrinter printer)
         {
+            if (_heading != null)
+            {
+                printer.SetOutlineHere(_heading.Level, _heading.Title);
+            }
             foreach (var t in _texts)
             {
                 t.PrintBy(printer);

@@ -41,7 +41,8 @@ namespace TextComposing.IO
                                 var headingText = HeadingParser.Parse(annotationText);
                                 if (headingText != null)
                                 {
-                                    //TODO: 見出しの処理の実装
+                                    //TODO: 見出しレベル
+                                    buffer.HeadingTitle = headingText;
                                     return;
                                 }
 

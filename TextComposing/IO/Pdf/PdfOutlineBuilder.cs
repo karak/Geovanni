@@ -22,19 +22,32 @@ namespace TextComposing.IO.Pdf
         /// </summary>
         /// <param name="level">階層構造のレベル（1以上）</param>
         /// <param name="title">見出し文字列</param>
+        /// <param name="cb">PDFデータ</param>
         /// <returns>生成されたアウトラインのパス</returns>
-        public string AppendOutline(int level, string title)
+        public void AppendOutline(int level, UString title, PdfContentByte cb)
+        {
+            AppendOutlineNode(level, title);
+            var path = Path(_currentNode);
+            var destination = new PdfDestination(PdfDestination.INDIRECT);
+            var added = cb.LocalDestination(path, destination);
+        }
+
+        private void AppendOutlineNode(int level, UString title)
         {
             if (level <= 0)
             {
                 throw new ArgumentOutOfRangeException("level");
+            }
+            if (title == null)
+            {
+                throw new ArgumentNullException("title");
             }
 
             //initial
             if (_currentNode == null)
             {
                 _initialLevel = level;
-                _currentNode = new OutlineNode("");
+                _currentNode = new OutlineNode(UString.Empty);
             }
 
             //TODO: behave initial level is the maximum(top) level
@@ -46,7 +59,7 @@ namespace TextComposing.IO.Pdf
             {
                 for (int i = currentLevel; i < level - 1; ++i)
                 {
-                    _currentNode = _currentNode.FirstChild("");
+                    _currentNode = _currentNode.FirstChild(UString.Empty);
                 }
                 _currentNode = _currentNode.FirstChild(title);
             }
@@ -58,8 +71,6 @@ namespace TextComposing.IO.Pdf
                 }
                 _currentNode = _currentNode.NextSibling(title);
             }
-
-            return Path(_currentNode);
         }
 
         public void GenerateTo(PdfOutline parentOutline)
@@ -88,7 +99,7 @@ namespace TextComposing.IO.Pdf
         {
             if (node == null) return;
             var counterString = Path(node);
-            var thisOutline = new PdfOutline(parentOutline, PdfAction.GotoLocalPage(counterString, false), node.Title);
+            var thisOutline = new PdfOutline(parentOutline, PdfAction.GotoLocalPage(counterString, false), node.Title.ToString());
 
             Visit(thisOutline, node.FirstChild());
             Visit(parentOutline, node.NextSibling());
@@ -106,22 +117,22 @@ namespace TextComposing.IO.Pdf
     {
         private readonly OutlineNode _parent;
         private readonly int _value;
-        private readonly string _title;
+        private readonly UString _title;
 
         private OutlineNode _firstChild = null;
         private OutlineNode _nextSibling = null;
 
-        public OutlineNode(string title)
+        public OutlineNode(UString title)
             : this(1, title)
         {
         }
 
-        public OutlineNode(int initialValue, string title)
+        public OutlineNode(int initialValue, UString title)
             : this(null, initialValue, title)
         {
         }
 
-        private OutlineNode(OutlineNode parent, int initialValue, string title)
+        private OutlineNode(OutlineNode parent, int initialValue, UString title)
         {
             _parent = parent;
             _value = initialValue;
@@ -138,7 +149,7 @@ namespace TextComposing.IO.Pdf
             return _firstChild;
         }
 
-        public OutlineNode FirstChild(string title)
+        public OutlineNode FirstChild(UString title)
         {
             if (_firstChild != null) throw new InvalidOperationException();
             return _firstChild = new OutlineNode(this, 1, title);
@@ -149,7 +160,7 @@ namespace TextComposing.IO.Pdf
             return _nextSibling;
         }
 
-        public OutlineNode NextSibling(string title)
+        public OutlineNode NextSibling(UString title)
         {
             if (_nextSibling != null) throw new InvalidOperationException();
             return _nextSibling = new OutlineNode(this._parent, this._value + 1, title);
@@ -182,7 +193,7 @@ namespace TextComposing.IO.Pdf
             }
         }
 
-        public string Title
+        public UString Title
         {
             get { return _title; }
         }

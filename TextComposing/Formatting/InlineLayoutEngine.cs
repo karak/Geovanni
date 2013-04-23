@@ -14,13 +14,14 @@ namespace TextComposing.Formatting
             IEnumerable<IFormatObject> objectList,
             GlueProperty endGlue,
             float penaltyValue,
+            Heading heading,
             InlineStyle style,
             out InlineStyle newStyle)
         {
             IFragment[] fragments = ConvertToFragments(ref startGlue, objectList, ref endGlue, style, out newStyle);
             var rubyLayoutedBuffer = LayoutRubyInLine(constraint, fragments, endGlue.Length);
             
-            return new UnjustifiedLine(rubyLayoutedBuffer, penaltyValue);
+            return new UnjustifiedLine(rubyLayoutedBuffer, penaltyValue, heading);
         }
 
         private static IFragment[] ConvertToFragments(ref GlueProperty startGlue, IEnumerable<IFormatObject> objectList, ref GlueProperty endGlue, InlineStyle style, out InlineStyle newStyle)

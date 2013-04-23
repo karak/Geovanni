@@ -57,16 +57,33 @@ namespace TextComposing.Formatting
         }
     }
 
+    internal class Heading
+    {
+        public Heading(int level, UString title)
+        {
+            if (level < 1) throw new ArgumentOutOfRangeException("level");
+            if (title == null) throw new ArgumentNullException("title");
+
+            Level = level;
+            Title = title;
+        }
+
+        public readonly int Level;
+        public readonly UString Title;
+    }
+
     internal class ParagraphModel : LineBreaking.IParagraphModel<Printing.IPrintableLine, InlineStyle>
     {
         private static readonly LineBreaking.IBreakPoint _startFlyweight = new StartOfParagraph();
         private static readonly LineBreaking.IBreakPoint _endFlyweight = new EndOfParagraph();
 
+        private Heading _heading = null;
         private IFormatObject[] _objectList;
 
-        public ParagraphModel(IFormatObject[] objectList)
+        public ParagraphModel(IFormatObject[] objectList, Heading heading = null)
         {
             _objectList = (IFormatObject[])(objectList.Clone());
+            _heading = heading;
 #if false
             foreach (var o in _objectList)
                 Console.Write(o.ToString() + "<>");
@@ -99,8 +116,16 @@ namespace TextComposing.Formatting
 
         LineBreaking.IUnjustifiedLine<Printing.IPrintableLine> LineBreaking.IParagraphModel<Printing.IPrintableLine, InlineStyle>.CreateLine(LineBreaking.ILineConstraint constraint, LineBreaking.IBreakPoint from, LineBreaking.IBreakPoint to, InlineStyle style, out InlineStyle newStyle)
         {
-            var factory = new UnjustifiedLineBuilder(_objectList);
+            var factory = new UnjustifiedLineBuilder(_objectList, _heading);
             return factory.CreateLine(constraint, style, from, to, out newStyle);
+        }
+
+        /// <summary>
+        /// このパラグラフが見出しである場合にそのデータを取得する。なければ null。
+        /// </summary>
+        public Heading Heading
+        {
+            get { return _heading; }
         }
 
         public override string ToString()

@@ -7,13 +7,15 @@ namespace TextComposing.Formatting
 {
     internal class UnjustifiedLine : LineBreaking.IUnjustifiedLine<Printing.IPrintableLine>
     {
+        private Heading _heading;
         private readonly InlineLayoutEngine.IFragment[] _fragmentList;
         private readonly float _penaltyValue;
 
-        public UnjustifiedLine(InlineLayoutEngine.IFragment[] fragmentList, float penaltyValue)
+        public UnjustifiedLine(InlineLayoutEngine.IFragment[] fragmentList, float penaltyValue, Heading heading)
         {
             _fragmentList = (InlineLayoutEngine.IFragment[])fragmentList.Clone();
             _penaltyValue = penaltyValue;
+            _heading = heading;
         }
 
         double LineBreaking.IUnjustifiedLine<Printing.IPrintableLine>.TotalLength
@@ -50,7 +52,7 @@ namespace TextComposing.Formatting
             {
                 buffer.Add(fragment.Justify((float)adjustmentRatio));
             }
-            var result = new JustifiedLine(buffer);
+            var result = new JustifiedLine(buffer, _heading);
             return result;
         }
 

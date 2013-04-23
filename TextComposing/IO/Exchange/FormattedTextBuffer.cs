@@ -10,6 +10,7 @@ namespace TextComposing.IO.Exchange
     {
         private UStringBuilder _textBuffer = new UStringBuilder(512);
         private Dictionary<int, MetaInfo> _metaInfos = new Dictionary<int, MetaInfo>();
+        private UString _headingTitle;
         
         public void Append(UString text)
         {
@@ -43,6 +44,12 @@ namespace TextComposing.IO.Exchange
             Upsert(end, MetaInfo.EMPHASYS_DOT_END);
         }
 
+        public UString HeadingTitle
+        {
+            get { return _headingTitle; }
+            set { _headingTitle = value; }
+        }
+
         private void Upsert(int index, uint flag, UString rubyText = null)
         {
             MetaInfo existing;
@@ -64,6 +71,11 @@ namespace TextComposing.IO.Exchange
 
         void IExchangableText.Accept(IExchangableTextVisitor visitor)
         {
+            if (_headingTitle != null)
+            {
+                visitor.Heading(1,_headingTitle);
+            }
+
             int index = 0;
             foreach (var letter in _textBuffer.ToUString())
             {

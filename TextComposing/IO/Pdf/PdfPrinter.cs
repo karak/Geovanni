@@ -357,16 +357,13 @@ namespace TextComposing.IO.Pdf
             _doc.NewPage();
             BeginPage();
 
-#if false
-            //TEST outline generation!
-            var cb = _writer.DirectContent;
-            string path = _outlineBuilder.AppendOutline(1, "Page Break(TEST)");
-            //TODO: no effect! Does PdfDocument have valid destination?
-            var destination = new PdfDestination(PdfDestination.FIT, 0, 0, 0, 0);
-            var added = cb.LocalDestination(path, destination);
-#endif
             //TODO: ページ先頭なら改ページなし
             //TODO: 改丁（両開き時のみ）
+        }
+
+        public void SetOutlineHere(int level, UString title)
+        {
+            _outlineBuilder.AppendOutline(level, title, _writer.DirectContent);
         }
 
         private void CloseEmDashRendering()

@@ -40,6 +40,11 @@ namespace AozoraToEdicolor
             _buffer.Append("</DCB>");
         }
 
+        void IExchangableTextVisitor.Heading(int level, UString title)
+        {
+            //TODO:
+        }
+
         public string GetText()
         {
             return _buffer.ToString();

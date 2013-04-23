@@ -16,5 +16,7 @@ namespace TextComposing.IO.Exchange
 
         void EmphasysDotStart();
         void EmphasysDotEnd();
+
+        void Heading(int level, UString title);
     }
 }

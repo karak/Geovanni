@@ -16,6 +16,7 @@ namespace TextComposing.Formatting
         private AdvancingStrategy _advancing;
         private ILatinWordMetric _latinMetric;
 
+        private Heading _heading;
         private TextBuffer _buffer;
 
         private class TextBuffer
@@ -226,6 +227,7 @@ namespace TextComposing.Formatting
         public void BeginParagraph()
         {
             _buffer = new TextBuffer(_zwSize, _wordWrap, _advancing, _latinMetric, 256);
+            _heading = null;
         }
 
         public TextEmphasysDot TextEmphasysDot
@@ -259,12 +261,18 @@ namespace TextComposing.Formatting
             rubyBuffer.Clear();
         }
 
+        public Heading Heading
+        {
+            set { _heading = value; }
+        }
+
         public ParagraphModel EndParagraph()
         {
             _buffer.EndOfLine();
-            var retval = new ParagraphModel(_buffer.ToArray());
+            var retval = new ParagraphModel(_buffer.ToArray(), _heading);
             _buffer.Clear();
             _buffer = null;
+            _heading = null;
             return retval;
         }
     }

@@ -85,6 +85,11 @@ namespace TextComposing.IO
             {
                 _builder.TextEmphasysDot = TextEmphasysDot.None;
             }
+
+            void IExchangableTextVisitor.Heading(int level, UString title)
+            {
+                _builder.Heading = new Formatting.Heading(level, title);
+            }
         }
     }
 }

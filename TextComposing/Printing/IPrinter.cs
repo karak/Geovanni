@@ -21,5 +21,7 @@ namespace TextComposing.Printing
         PrinterMemento StorePositionAndFont();
 
         void PageBreak();
+
+        void SetOutlineHere(int level, UString title);
     }
 }

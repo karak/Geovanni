@@ -10,10 +10,12 @@ namespace TextComposing.Formatting
     internal class UnjustifiedLineBuilder
     {
         private IFormatObject[] _objectList;
+        private Heading _heading;
 
-        public UnjustifiedLineBuilder(IFormatObject[] objectList)
+        public UnjustifiedLineBuilder(IFormatObject[] objectList, Heading heading)
         {
             _objectList = objectList;
+            _heading = heading;
         }
 
         public LineBreaking.IUnjustifiedLine<Printing.IPrintableLine> CreateLine(LineBreaking.ILineConstraint constraint, InlineStyle style, LineBreaking.IBreakPoint from, LineBreaking.IBreakPoint to, out InlineStyle newStyle)
@@ -76,7 +78,7 @@ namespace TextComposing.Formatting
 
         private LineBreaking.IUnjustifiedLine<Printing.IPrintableLine> CreateLine(LineBreaking.ILineConstraint constraint, StartOfParagraph from, EndOfParagraph to, InlineStyle style, out InlineStyle newStyle)
         {
-            return InlineLayoutEngine.Solve(constraint, from.Glue, _objectList, to.Glue, PenaltyValue(to), style, out newStyle);
+            return InlineLayoutEngine.Solve(constraint, from.Glue, _objectList, to.Glue, PenaltyValue(to), _heading, style, out newStyle);
         }
 
         private static int PenaltyValue(LineBreaking.IBreakPoint to)
@@ -88,7 +90,7 @@ namespace TextComposing.Formatting
         {
             var toIndex = Array.IndexOf(_objectList, to);
             if (toIndex == -1) throw new ArgumentException("to");
-            return InlineLayoutEngine.Solve(constraint, from.Glue, _objectList.Take(toIndex), to.GlueBeforeBreak, PenaltyValue(to), style, out newStyle);
+            return InlineLayoutEngine.Solve(constraint, from.Glue, _objectList.Take(toIndex), to.GlueBeforeBreak, PenaltyValue(to), _heading, style, out newStyle);
         }
 
         private LineBreaking.IUnjustifiedLine<Printing.IPrintableLine> CreateLine(LineBreaking.ILineConstraint constraint, IInterletter from, IInterletter to, InlineStyle style, out InlineStyle newStyle)
@@ -100,7 +102,7 @@ namespace TextComposing.Formatting
             return InlineLayoutEngine.Solve(
                 constraint, 
                 new GlueProperty(from.IndentAfterBreak, 0, 0),
-                _objectList.Skip(fromIndex + 1).Take(toIndex - fromIndex - 1), to.GlueBeforeBreak, PenaltyValue(to), style, out newStyle);
+                _objectList.Skip(fromIndex + 1).Take(toIndex - fromIndex - 1), to.GlueBeforeBreak, PenaltyValue(to), _heading, style, out newStyle);
         }
 
         private LineBreaking.IUnjustifiedLine<Printing.IPrintableLine> CreateLine(LineBreaking.ILineConstraint constraint, IInterletter from, EndOfParagraph to, InlineStyle style, out InlineStyle newStyle)
@@ -110,7 +112,7 @@ namespace TextComposing.Formatting
             return InlineLayoutEngine.Solve(
                 constraint, 
                 new GlueProperty(from.IndentAfterBreak, 0, 0),
-                _objectList.Skip(fromIndex + 1), to.Glue, PenaltyValue(to), style, out newStyle);
+                _objectList.Skip(fromIndex + 1), to.Glue, PenaltyValue(to), _heading, style, out newStyle);
         }
     }
 
